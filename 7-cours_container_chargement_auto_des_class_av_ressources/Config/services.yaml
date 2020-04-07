@@ -1,0 +1,39 @@
+parameters:
+  mailer.gmail_user: "monmail@gmail.com"
+  mailer.gmail_password: "123456"
+  texter.sms_serviceDns: 'services.sms.com'
+  texter.sms_key: "apikey123"
+  mailer.smtp_dns: "142.0.2.1"
+  mailer.smtp_user: 'contact@brunopredot.com'
+  mailer.smtp_password: "monMDP"
+
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    bind:
+      $firstname: "Bruno"
+
+  App\: # là on lui dit tu vas me charger tout ce qui commence par App
+    resource: "../src" # et tu vas trouver cela dans le dossier src
+    exclude: "../src/{DependencyInjection}" # et tu charges tout sauf ça
+
+  App\Mailer\GmailMailer:
+    arguments: ['%mailer.gmail_user%', '%mailer.gmail_password%']
+
+  App\Texter\SmsTexter:
+    arguments: ["%texter.sms_serviceDns%", "%texter.sms_key%"]
+
+  App\Mailer\SmtpMailer:
+    arguments: ['%mailer.smtp_dns%', '%mailer.smtp_user%', '%mailer.smtp_password%']
+
+  App\Controller\OrderController:
+    public: true
+    calls:
+      - method: sayHello
+        arguments: ["Bonjour à tous", 41]
+
+  App\Mailer\MailerInterface:
+    alias: App\Mailer\GmailMailer
+  App\Texter\TexterInterface:
+    alias: App\Texter\SmsTexter

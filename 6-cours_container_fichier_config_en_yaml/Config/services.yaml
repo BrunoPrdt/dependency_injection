@@ -1,0 +1,58 @@
+parameters:
+  mailer.gmail_user: "monmail@gmail.com"
+  mailer.gmail_password: "123456"
+  texter.sms_serviceDns: 'services.sms.com'
+  texter.sms_key: "apikey123"
+  mailer.smtp_dns: "142.0.2.1"
+  mailer.smtp_user: 'contact@brunopredot.com'
+  mailer.smtp_password: "monMDP"
+
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    bind:
+      $firstname: "Bruno"
+
+
+  database:
+    class: App\Database\Database
+
+  mailer.gmail:
+    class: App\Mailer\GmailMailer
+    arguments: ['%mailer.gmail_user%', '%mailer.gmail_password%']
+
+  texter.sms:
+    class: App\Texter\SmsTexter
+    arguments: ["%texter.sms_serviceDns%", "%texter.sms_key%"]
+
+  texter.fax:
+    class: App\Texter\FaxTexter
+
+  mailer.smtp:
+    class: App\Mailer\SmtpMailer
+    arguments: ['%mailer.smtp_dns%', '%mailer.smtp_user%', '%mailer.smtp_password%']
+
+  order_controller:
+    class: App\Controller\OrderController
+    public: true
+    calls:
+      - method: sayHello
+        arguments: ["Bonjour à tous", 41]
+      - method: setSecondaryMailer
+        arguments: ["@mailer.smtp"]
+
+  logger:
+    class: App\Logger
+
+  App\Controller\OrderController:
+    alias: order_controller
+    public: true
+  App\Database\Database: '@database'
+  App\Mailer\GmailMailer: '@mailer.gmail'
+  App\Mailer\SmtpMailer: '@mailer.smtp'
+  App\Mailer\MailerInterface: '@mailer.gmail'
+  App\Texter\SmsTexter: '@texter.sms'
+  App\Texter\FaxTexter: '@texter.fax'
+  App\Texter\TexterInterface: '@texter.sms'
+  App\Logger: '@logger'

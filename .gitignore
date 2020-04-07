@@ -1,0 +1,9 @@
+vendor/
+/Config
+/src
+.idea
+/vendor
+/views
+composer.json
+composer.lock
+index.php
